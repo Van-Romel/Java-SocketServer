@@ -51,7 +51,6 @@ public class FormCliente implements ActionListener {
 
         janela.setSize(600, 300);
         janela.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
-//        janela.setLayout(new GridLayout(7,1));
 
         rotuloNome.setText("Nome");
         rotuloIdade.setText("Idade");

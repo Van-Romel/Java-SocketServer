@@ -2,6 +2,9 @@ package local.javaredes;
 
 import java.io.Serializable;
 
+/**
+ * @author Van-Romel Alves Sena Neto
+ */
 public class Pessoa implements Serializable {
 
     private String nome;
