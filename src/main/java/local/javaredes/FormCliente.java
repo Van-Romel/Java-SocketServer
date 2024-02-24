@@ -96,6 +96,10 @@ public class FormCliente implements ActionListener {
                 conexao.close();
             } catch (IOException  exception) {
                 Logger.getLogger(Servidor.class.getName()).log(Level.SEVERE, null, exception);
+
+                try {
+                    conexao.close();
+                } catch (IOException ignored) {}
             }
         }
     }
