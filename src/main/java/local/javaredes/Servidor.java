@@ -1,10 +1,10 @@
 package local.javaredes;
 
-import java.io.DataOutputStream;
+import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.ObjectInputStream;
-import java.net.ServerSocket;
-import java.net.Socket;
+import java.net.DatagramPacket;
+import java.net.DatagramSocket;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -15,28 +15,31 @@ import java.util.logging.Logger;
  */
 public class Servidor {
 
-    private static ServerSocket servidor;
-    private static Socket conexao;
+    private static DatagramSocket conexao;
+    private static DatagramPacket datagrama;
+
+    private static ByteArrayInputStream entradaStream;
     private static ObjectInputStream entrada;
-    private static DataOutputStream saida;
 
     public static void main(String[] args) {
 
         try {
-            servidor = new ServerSocket(55000);
-            System.out.println("Aguardando conexao...");
-            conexao = servidor.accept();
+            conexao = new DatagramSocket(55000);
 
-            entrada = new ObjectInputStream(conexao.getInputStream());
-            Pessoa pessoa = (Pessoa) entrada.readObject();
-            System.out.printf("Nome: %s%n", pessoa.getNome());
-            System.out.printf("Idade: %d", pessoa.getIdade());
+            while (true) {
+                System.out.println("Aguardando conexao...");
+                datagrama = new DatagramPacket(new byte[1024], 1024);
+                conexao.receive(datagrama);
 
-            saida = new DataOutputStream(conexao.getOutputStream());
+                entradaStream = new ByteArrayInputStream(datagrama.getData());
+                entrada = new ObjectInputStream(entradaStream);
+                Pessoa pessoa = (Pessoa) entrada.readObject();
+                System.out.printf("%nObjeto recebido:%n\tNome: %s%n\tIdade: %d%n", pessoa.getNome(), pessoa.getIdade());
 
-            saida.writeUTF("Dados recebidos corretamente!");
-
-            conexao.close();
+                var resposta = "Dados recebidos corretamente!".getBytes();
+                datagrama = new DatagramPacket(resposta, resposta.length, datagrama.getAddress(), datagrama.getPort());
+                conexao.send(datagrama);
+            }
         } catch (IOException | ClassNotFoundException exception) {
             Logger.getLogger(Servidor.class.getName()).log(Level.SEVERE, null, exception);
         }
